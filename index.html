@@ -226,6 +226,80 @@
     color: var(--ink-2);
     line-height: 1.6;
   }
+  .flow {
+    list-style: none;
+    margin: 8px auto 0;
+    padding: 0;
+    max-width: 680px;
+  }
+  .flow > li {
+    position: relative;
+    margin: 0 0 26px;
+    padding: 12px 16px 12px 52px;
+    background: var(--wx-green-soft);
+    border: 1px solid #C8EBD6;
+    border-radius: 10px;
+  }
+  .flow > li:last-child { margin-bottom: 0; }
+  .flow > li::after {
+    content: "";
+    position: absolute;
+    left: 24px;
+    bottom: -18px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid var(--wx-green);
+  }
+  .flow > li:last-child::after { display: none; }
+  .flow .n {
+    position: absolute;
+    left: 12px;
+    top: 14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--wx-green);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .flow strong {
+    display: block;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+  .flow span {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .flow .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 12px;
+    background: transparent;
+    border: 0;
+  }
+  .flow .split::after { left: 50%; margin-left: -6px; }
+  .flow .split div {
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #C8EBD6;
+    border-radius: 10px;
+  }
+  @media (max-width: 720px) {
+    .flow .split { grid-template-columns: 1fr; }
+  }
   .footer {
     text-align: center;
     color: var(--ink-3);
@@ -480,6 +554,74 @@
     <div class="meta">来源：<a href="https://pay.weixin.qq.com/doc/v3/merchant/4013287504" target="_blank" rel="noopener">pay.weixin.qq.com 管理商户号绑定的 APPID</a></div>
     <p class="desc">一个商户号最多关联 50 个 AppID。主体不一致要补 AppID 主体信息。小程序上已有商户号时，新商户号费率必须一致，否则不能在线绑定。绑定后暂不支持解绑。三家要各自建一条绑定。</p>
     <div class="shot"><img src="screenshots/appid_limits.png" alt="商户号绑定 AppID 的七条限制"></div>
+  </section>
+
+  <section class="card" id="flow">
+    <span class="badge">流程</span>
+    <h2>三家开户到收款</h2>
+    <p class="desc">每家公司走一遍。超级管理员是经办人。法人不扫微信，账户验证用对公户汇款。东莞对公户名用「启迈检测（东莞）有限公司」。</p>
+    <ol class="flow">
+      <li>
+        <span class="n">1</span>
+        <strong>备齐材料</strong>
+        <span>当前营业执照、同名人民币对公户、PND 护照和中英文对照说明、经办人证件、业务办理授权函、经办人实名微信。</span>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <strong>经办人扫码建单</strong>
+        <span>在 pay.weixin.qq.com 点接入微信支付。扫码的微信号就是超级管理员，负责签约、收通知、操作资金。</span>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <strong>填写企业和结算户</strong>
+        <span>主体选企业。上传执照、法人护照、经营信息和小程序 AppID。结算户只填该公司对公账户，户名与当前执照全称一致。</span>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <strong>对公户汇给财付通</strong>
+        <span>账户验证不走法人扫码。用这家公司的对公账户，向财付通汇入页面上的指定金额。</span>
+      </li>
+      <li>
+        <span class="n">5</span>
+        <strong>资料审核 1–3 个工作日</strong>
+        <span>审核结果发到经办人的微信、短信和邮件。姓名对不上或户名是曾用名，会转人工。</span>
+      </li>
+      <li>
+        <span class="n">6</span>
+        <strong>经办人刷脸</strong>
+        <span>签约前的身份核验由超级管理员刷脸。法人不用刷。</span>
+      </li>
+      <li>
+        <span class="n">7</span>
+        <strong>签约审核 1–2 个工作日</strong>
+        <span>通过后商户号开通，钱结算进这家公司自己的人民币对公户。</span>
+      </li>
+      <li>
+        <span class="n">8</span>
+        <strong>小程序先认证、再备案</strong>
+        <span>未认证不能使用微信支付。未备案不能上架。这两件事和开户同时排。</span>
+      </li>
+      <li class="split">
+        <div>
+          <strong>和小程序是同一家</strong>
+          <span>超管发起绑定。小程序管理员 7 天内确认，过期作废。</span>
+        </div>
+        <div>
+          <strong>另外两家</strong>
+          <span>签《微信支付联合营运承诺函》，审核大约 1–2 个工作日。绑定后不能解绑。</span>
+        </div>
+      </li>
+      <li>
+        <span class="n">9</span>
+        <strong>三个商户号绑同一个小程序</strong>
+        <span>客户付哪家的发票，就进哪家的商户号。一笔款不能拆给两家。</span>
+      </li>
+      <li>
+        <span class="n">10</span>
+        <strong>支付宝留在网站</strong>
+        <span>这个微信小程序里只拉起微信支付。支付宝在浏览器里的网站付款页完成，不进小程序。</span>
+      </li>
+    </ol>
   </section>
 
 </main>
