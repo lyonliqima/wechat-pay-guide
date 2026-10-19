@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>境内三家公司接入微信支付</title>
+<style>
+  :root {
+    --wx-green: #07C160;
+    --wx-green-soft: #E8F8EE;
+    --ink: #1F2329;
+    --ink-2: #4E5969;
+    --ink-3: #86909C;
+    --line: #E5E6EB;
+    --bg: #F7F8FA;
+    --card: #FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .header {
+    background: var(--wx-green);
+    color: #fff;
+    padding: 56px 24px 72px;
+  }
+  .header-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .header h1 {
+    margin: 0 0 10px;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .header p {
+    margin: 0;
+    font-size: 15px;
+    opacity: 0.92;
+    max-width: 760px;
+  }
+  .container {
+    max-width: 1280px;
+    margin: -36px auto 64px;
+    padding: 0 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 28px 32px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .badge {
+    display: inline-block;
+    background: var(--wx-green-soft);
+    color: var(--wx-green);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+  .card h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .meta {
+    color: var(--ink-3);
+    font-size: 13px;
+    margin-bottom: 18px;
+    word-break: break-all;
+  }
+  .meta a {
+    color: var(--ink-3);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--ink-3);
+  }
+  .meta a:hover { color: var(--wx-green); border-bottom-color: var(--wx-green); }
+  .desc {
+    color: var(--ink-2);
+    font-size: 14.5px;
+    margin: 0 0 20px;
+  }
+  .desc strong { color: var(--ink); font-weight: 600; }
+  .shot {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #F0F1F3;
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .answer h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .q {
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .q-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .q-num {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    margin-top: 2px;
+    border-radius: 50%;
+    background: var(--wx-green);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .answer p, .answer li { font-size: 14.5px; color: var(--ink-2); }
+  .answer ul, .answer ol { margin: 12px 0 0; padding-left: 1.25em; }
+  .answer li { margin: 6px 0; }
+  .answer a { color: #067A45; }
+  .callout {
+    background: var(--wx-green-soft);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 0 0 16px;
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .answer .label {
+    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .note {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+  table.facts {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  table.facts th, table.facts td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.facts th { background: #F7F8FA; font-weight: 600; }
+  table.facts th:first-child,
+  table.facts td:first-child {
+    width: 128px;
+    white-space: nowrap;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  table.facts td:last-child { color: var(--ink-2); font-weight: 400; }
+  table.facts.entities th:first-child,
+  table.facts.entities td:first-child {
+    width: 240px;
+    white-space: normal;
+  }
+  .pits {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+  }
+  .pits li {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    column-gap: 12px;
+    row-gap: 4px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+  }
+  .pits li:first-child { border-top: 0; padding-top: 0; }
+  .pits .n {
+    grid-row: 1 / span 2;
+    width: 28px;
+    height: 28px;
+    margin-top: 1px;
+    border-radius: 50%;
+    background: var(--wx-green-soft);
+    color: #067A45;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pits strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .pits span {
+    font-size: 14.5px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .footer {
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 12px;
+    padding: 24px 24px 48px;
+    line-height: 1.7;
+  }
+  @media (max-width: 720px) {
+    .header { padding: 40px 20px 56px; }
+    .header h1 { font-size: 24px; }
+    .container { padding: 0 16px; }
+    .card { padding: 20px; }
+    table.facts th:first-child,
+    table.facts td:first-child { width: 34%; white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <h1>境内三家公司接入微信支付</h1>
+    <p>三家都在境内，各开一个境内商户号。下面是开户资料、审核时间、小程序绑定、支付宝，以及容易卡住的点。<br>检索日期 2026-10-19。</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="card answer" id="answers">
+    <span class="badge">问答</span>
+    <h2>三问直接答复</h2>
+
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">1</span>
+        <h3>作为外企应该怎么建立微信支付的商户账号，需要准备哪些资料，大概要多久时间审核</h3>
+      </div>
+      <div class="callout">三家都是独立公司，各开一个境内商户号，入口 <a href="https://pay.weixin.qq.com/">pay.weixin.qq.com</a>，钱进该公司自己的人民币对公账户。法人都是 Pierre Nicolas Disser（PND）。同一个人要配合三家的开户意愿和刷脸，三家仍然是三个商户号。</div>
+      <table class="facts entities">
+        <thead>
+          <tr><th>公司</th><th>依据</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>启迈检测（东莞）有限公司</td><td>天眼查 <a href="https://www.tianyancha.com/company/2350647307">2350647307</a>。法人 Pierre Nicolas Disser。曾用名启迈瀚莎检测服务（东莞）有限公司，2025 年 6 月起用现名，对公户名必须是现名。</td></tr>
+          <tr><td>另外两家</td><td>爱企查 <a href="https://aiqicha.baidu.com/company_directors_23394249591525">23394249591525</a>、天眼查 <a href="https://www.tianyancha.com/company/2324323301">2324323301</a>。这两个页面本次没有打开。按你的确认，法人同样是 PND，各用自己的营业执照和对公户。</td></tr>
+        </tbody>
+      </table>
+      <p class="label">准备资料</p>
+      <table class="facts">
+        <thead>
+          <tr><th>资料</th><th>要求</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>超级管理员微信</td><td>扫码创建申请单的微信号就是超管，负责签约、收开户通知、操作资金。必须是法定代表人或经办人。</td></tr>
+          <tr><td>营业执照</td><td>5MB 内彩色照片、扫描件，或加盖公章的复印件。主体类型选企业。</td></tr>
+          <tr><td>法定代表人证件</td><td>支持大陆身份证、护照、港澳台通行证、外国人居留证、港澳台居住证。护照不需要反面。外籍法人姓名中英文不一致时，把执照姓名和护照名都写上，并附翻译件或盖章说明函，转人工审核。</td></tr>
+          <tr><td>经办人材料</td><td>超管不是法人时，要经办人证件，以及业务办理授权函。</td></tr>
+          <tr><td>最终受益人</td><td>法人不是唯一受益人时，最多填 4 人。证件类型同样支持护照。</td></tr>
+          <tr><td>经营信息</td><td>商户简称、真实客服电话、行业，以及已认证的小程序 AppID。</td></tr>
+          <tr><td>结算账户</td><td>企业只能填对公账户，户名必须与当前执照名称一致，收人民币。不能用私人卡，也不能用境外账户。</td></tr>
+        </tbody>
+      </table>
+      <p class="label">审核多久</p>
+      <ul>
+        <li>账户验证通过后，资料审核 <strong>1–3 个工作日</strong>。</li>
+        <li>超管刷脸后，签约审核再 <strong>1–2 个工作日</strong>。</li>
+        <li>法人当周能配合，按大约一周排一家。三家法人是同一个人，刷脸和开户意愿要做三次，整体按数周排。外籍法人执照中文名和护照英文名不一致，或东莞对公户还是曾用名，会再拉长。</li>
+      </ul>
+    </div>
+
+    <div class="q">
+      <div class="q-head">
+        <span class="q-num">2</span>
+        <h3>作为外企应该怎么在微信小程序做系统连接关联微信支付？是否可以关联支付宝支付</h3>
+      </div>
+      <div class="callout">可以关联微信支付。不能在这个微信小程序里调起支付宝。</div>
+      <p class="label">系统连接</p>
+      <ol>
+        <li>小程序用企业主体注册，完成微信认证和小程序备案，拿到 AppID。未认证不能使用微信支付。</li>
+        <li>商户号签约后，超管在「产品中心 → APPID 授权管理」或「账户中心 → 经营场景管理」填写 AppID。主体一致的，小程序管理员在公众平台确认，7 天内不确认就作废。主体不一致要签《微信支付联合营运承诺函》，审核大约 1–2 个工作日。</li>
+        <li>后台用小程序下单接口拿到 <code>prepay_id</code>，前端用 <code>wx.requestPayment</code> 拉起收银台。下单 AppID、调起 AppID 和付款用户必须一致。</li>
+      </ol>
+      <p>一个小程序可以绑多个商户号。三家公司就是三个商户号绑同一个小程序。每笔付款只进一个商户号。</p>
+      <p class="label">支付宝放在网站收银台，是什么意思</p>
+      <p>网站收银台就是公司网站上的付款页，用手机或电脑的浏览器打开，不在微信小程序里面。客户在那一页选择支付宝，浏览器再打开支付宝自己的付款页。钱进支付宝商户号，不进微信商户号。</p>
+      <p>微信小程序里只能拉起微信支付。把支付宝网页嵌进小程序（web-view）也不行，官方写明这里不能跑 H5 支付。从微信里跳出去再打开支付宝，也不能当成这个小程序的收款方式。</p>
+      <p>客户要付支付宝，只有两条路：</p>
+      <ol>
+        <li>留在网站付款页。小程序里可以写一句「支付宝请到网站支付」，真正扣款发生在浏览器。网站上如果已经接了支付宝，就继续用那一页，不必为了小程序再开一套。</li>
+        <li>另做一个支付宝小程序。那是支付宝 App 里的另一个程序，要单独的支付宝商户号，和这三家微信商户号不是同一套账户。</li>
+      </ol>
+      <p>同一张发票不要两个渠道各付一次。微信付过的，网站付款页要显示已付。</p>
+    </div>
+  </section>
+
+  <section class="card" id="pitfalls">
+    <span class="badge">注意</span>
+    <h2>开户和接入时容易踩的坑</h2>
+    <p class="desc">三家法人都是 Pierre Nicolas Disser。坑集中在同一个人要配合三次，以及每笔钱必须进开票那家公司。</p>
+    <ol class="pits">
+      <li>
+        <span class="n">1</span>
+        <strong>三家各开一个商户号，一笔款不能进两家</strong>
+        <span>小程序可以绑三个商户号，每张发票只进开票公司自己的商户号。绑错公司，钱就进错账户。同一个法人不代表可以共用一个商户号。</span>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <strong>PND 要配合三次开户意愿和刷脸</strong>
+        <span>超管如果不是法人，每家都要经办人证件和业务办理授权函。执照上的中文名和护照英文名对不上，要附翻译件或盖章说明，转人工，三家都会慢。</span>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <strong>对公户名必须是当前执照全称</strong>
+        <span>东莞 2025 年 6 月从「启迈瀚莎检测服务（东莞）有限公司」改为「启迈检测（东莞）有限公司」。银行户名还是曾用名，开户过不了。企业不能用私人卡，也不能用境外账户。</span>
+      </li>
+      <li>
+        <span class="n">4</span>
+        <strong>小程序主体和商户号不是同一家时，要另签承诺函</strong>
+        <span>主体一致，小程序管理员 7 天内确认即可。主体不一致要签《微信支付联合营运承诺函》，审核大约 1–2 个工作日。绑定后不能解绑。费率不一致会直接拦在线绑定。</span>
+      </li>
+      <li>
+        <span class="n">5</span>
+        <strong>这个微信小程序里调不起支付宝</strong>
+        <span>web-view 里也不能跑 H5 支付。支付宝留在浏览器里的网站付款页，或另做支付宝小程序。扣款不在这个微信小程序里发生。</span>
+      </li>
+      <li>
+        <span class="n">6</span>
+        <strong>未认证、未备案、未发布，都收不了款</strong>
+        <span>未认证不能使用微信支付。未发布的小程序每月测试额度 1 万元，满 3 个月不能收款。备案平台审 1–2 个工作日，省管局大约 1–20 个工作日，和开户是两条线。</span>
+      </li>
+      <li>
+        <span class="n">7</span>
+        <strong>前端支付成功不能当入账</strong>
+        <span>以商户后台的支付结果通知为准。实验室发票不要按实物电商类目申报，那条线会要求做订单发货管理。</span>
+      </li>
+      <li>
+        <span class="n">8</span>
+        <strong>T+1 是先到微信基本账户，0.6% 只是示例</strong>
+        <span>当天不一定到银行。手续费按笔扣除、四舍五入到分。行业费率表不是合同，以商户平台核定的费率为准。</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <span class="badge">01</span>
+    <h2>微信支付商户平台首页</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/" target="_blank" rel="noopener">pay.weixin.qq.com</a></div>
+    <p class="desc"><strong>三家公司开境内商户号的入口。</strong>申请从这里提交，签约后在商户平台登录操作。</p>
+    <div class="shot"><img src="screenshots/pay_home.png" alt="微信支付商户平台首页截图"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">02</span>
+    <h2>小程序支付开发指引</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/doc/v3/partner/4012076732" target="_blank" rel="noopener">pay.weixin.qq.com/doc/v3/partner/4012076732</a></div>
+    <p class="desc"><strong>小程序接入微信支付的官方开发文档。</strong>页面包含开发前准备（设置安全联系人、API 密钥、平台证书）、业务开发流程概览图，以及用户/服务商/微信支付系统/后台四方泳道时序图——技术对接时直接照着改参数即可。注意底部提醒：交易类小程序需满足公众平台《交易类小程序运营规范》才能在正式环境调起支付。</p>
+    <div class="shot"><img src="screenshots/mini_program_pay.png" alt="小程序支付开发指引截图"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">03</span>
+    <h2>经营场景管理 · AppID 绑定</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/doc/v3/merchant/4017312501" target="_blank" rel="noopener">pay.weixin.qq.com/doc/v3/merchant/4017312501</a></div>
+    <p class="desc"><strong>小程序 AppID 绑定商户号的流程。</strong>主体一致，小程序管理员确认即可。三家里和小程序注册公司不是同一家的，要签《微信支付联合营运承诺函》。未发布的小程序每月测试额度 1 万元，满 3 个月不能收款。实物电商类目还有额外限制，实验室发票不要报成这一类。</p>
+    <div class="shot"><img src="screenshots/appid_bind.png" alt="经营场景管理截图"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">04</span>
+    <h2>资料审核 1–3 个工作日</h2>
+    <div class="meta">来源：<a href="http://kf.qq.com/faq/180910eUfeyu180910BFZNJN.html" target="_blank" rel="noopener">kf.qq.com 商户入驻详细流程</a> · 对应 PRD：商户号开通时长</div>
+    <p class="desc">账户验证通过后，微信支付在 <strong>1–3 个工作日</strong>内完成资料审核，并用公众号、短信、邮件通知超级管理员。帮助页里的示例单同时写着结算周期 T+1、结算费率 0.6%。签约刷脸之后还有一轮签约审核。</p>
+    <div class="shot"><img src="screenshots/onboarding_review.png" alt="腾讯客服：资料审核 1 到 3 个工作日"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">05</span>
+    <h2>手续费与结算周期</h2>
+    <div class="meta">来源：<a href="https://kf.qq.com/faq/140225MveaUz1504092YFjeM.html" target="_blank" rel="noopener">kf.qq.com 结算规则、费率、周期说明</a> · 对应 PRD：Q4 的费率机制</div>
+    <p class="desc"><strong>T+1 是当天结算到商户平台基本账户</strong>，不是当天到银行。手续费按单笔四舍五入到分后扣除。示例费率是 0.6%。具体行业费率以商户平台核准记录为准，成本中心怎么记账要财务定，官方页面不规定。</p>
+    <div class="shot"><img src="screenshots/settlement_cycle.png" alt="结算规则：T+1 与 0.6% 计算示例"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">06</span>
+    <h2>异主体绑定小程序</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/static/pay_setting/appid_protocol.shtml" target="_blank" rel="noopener">pay.weixin.qq.com APPID 授权管理</a> · 对应 PRD：Q2</div>
+    <p class="desc">商户号主体和小程序主体不一致时，要签《微信支付联合运营承诺函》，平台审核一般 <strong>1–2 个工作日</strong>，再由小程序管理员确认。三家是不同公司，只有和小程序注册公司不一致的那几家走这条。</p>
+    <div class="shot"><img src="screenshots/appid_cross_entity.png" alt="异主体 AppID 绑定与联合运营承诺函"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">07</span>
+    <h2>先微信认证，才能用微信支付</h2>
+    <div class="meta">来源：<a href="https://developers.weixin.qq.com/miniprogram/introduction/" target="_blank" rel="noopener">微信开放文档 · 小程序接入指南</a> · 对应 PRD：小程序前置条件</div>
+    <p class="desc">企业小程序可以先注册。官方写明：<strong>已认证账号可使用微信支付权限</strong>。个人主体不能做微信认证。入口是小程序后台「设置 → 基本设置 → 微信认证」。</p>
+    <div class="shot"><img src="screenshots/wx_verify.png" alt="小程序申请微信认证后可使用微信支付"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">08</span>
+    <h2>小程序备案，管局 1–20 个工作日</h2>
+    <div class="meta">来源：<a href="https://developers.weixin.qq.com/miniprogram/product/record/guidelines.html" target="_blank" rel="noopener">微信开放文档 · 小程序备案操作指引</a> · 对应 PRD：Q5 的备案部分</div>
+    <p class="desc">上架前要备案。平台初审 1–2 个工作日，工信部短信核验要在 24 小时内完成，省通信管理局再审 <strong>1–20 个工作日</strong>。这是备案，不是增值电信业务经营许可证。经营性许可证要不要办，这页没有结论，仍由法务看 Q5。</p>
+    <div class="shot"><img src="screenshots/icp_filing.png" alt="小程序备案通管局审核 1 到 20 个工作日"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">09</span>
+    <h2>个人付款限额：没有一个统一上限</h2>
+    <div class="meta">来源：<a href="https://kf.qq.com/touch/sappfaq/161129fmyYBR161129zyeeei.html" target="_blank" rel="noopener">央行账户限额调整通知</a> · <a href="https://gtimg.wechatpay.cn/resource/xres/build/wxpayuserinfo/wxpay_user_agreement/latest/userservice.html" target="_blank" rel="noopener">微信支付用户服务协议</a> · 对应 PRD：Q7</div>
+    <p class="desc">零钱按账户类别有年度额度：I 类 1000 元终身，II 类 10 万元/年，III 类 20 万元/年。超过后可以用银行卡付。协议写明交易限额由监管、场景、风控和银行共同决定，<strong>以收银台当时的提示为准</strong>。下面第二张表是转账、红包、面对面，不是实验室发票的单笔上限。</p>
+    <div class="shot"><img src="screenshots/account_class_limit.png" alt="零钱账户分类额度"></div>
+    <div class="shot" style="margin-top:16px"><img src="screenshots/user_limit.png" alt="用户服务协议：限额以收银台提示为准"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">10</span>
+    <h2>企业只能填对公账户，户名与执照一致</h2>
+    <div class="meta">来源：<a href="http://kf.qq.com/faq/180910eUfeyu180910BFZNJN.html" target="_blank" rel="noopener">kf.qq.com 商户入驻详细流程 · 填写结算账户</a></div>
+    <p class="desc">三家都是企业，只看第 ② 条：<strong>只能选对公账户</strong>，户名必须和当前申请单主体一致。第 ① 条、第 ③ 条是个体工商户和个人储蓄卡，用不上。</p>
+    <div class="shot"><img src="screenshots/corp_account.png" alt="企业仅支持对公账户，户名与申请主体一致"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">11</span>
+    <h2>账户验证：法人微信扫码，或对公户汇一笔</h2>
+    <div class="meta">来源：<a href="http://kf.qq.com/faq/180910eUfeyu180910BFZNJN.html" target="_blank" rel="noopener">kf.qq.com 商户入驻详细流程 · 账户验证</a></div>
+    <p class="desc">资料校验通过后，两种方式任选其一：<strong>法人的实名微信扫码</strong>，或用结算账户向财付通汇入指定金额。三家法人都是 PND，扫码就要他本人做三次。图里的申请单和二维码是帮助页示例。</p>
+    <div class="shot"><img src="screenshots/account_verify.png" alt="账户验证：法人微信扫码或结算账户汇款"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">12</span>
+    <h2>外籍法人：执照中文名和护照英文名</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/static/help_guide/register_guide.shtml" target="_blank" rel="noopener">pay.weixin.qq.com 商户开户意愿确认指引</a> · <span style="white-space:nowrap">Q17</span></div>
+    <p class="desc">执照上的法人姓名和护照姓名不一致时，两处都写成「中文（英文）」，护照翻译件或盖鲜章的证明函和护照拼在证件正面，转人工审核。PND 三家申请都要按这个准备。</p>
+    <div class="shot"><img src="screenshots/passport_name.png" alt="境外法人执照姓名与护照姓名不一致的填写方法"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">13</span>
+    <h2>小程序里不能跑 H5 支付</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/doc/v3/partner/4013352071" target="_blank" rel="noopener">pay.weixin.qq.com 小程序支付常见问题</a></div>
+    <p class="desc">官方写明：<strong>小程序 web-view 内不支持 H5 支付</strong>，H5 支付只能在外部浏览器里用。所以这个小程序里做不了支付宝收银台。</p>
+    <div class="shot"><img src="screenshots/no_h5_in_miniprogram.png" alt="小程序 web-view 不支持 H5 支付"></div>
+  </section>
+
+  <section class="card">
+    <span class="badge">14</span>
+    <h2>一个商户号最多绑 50 个 AppID，绑了不能解</h2>
+    <div class="meta">来源：<a href="https://pay.weixin.qq.com/doc/v3/merchant/4013287504" target="_blank" rel="noopener">pay.weixin.qq.com 管理商户号绑定的 APPID</a></div>
+    <p class="desc">一个商户号最多关联 50 个 AppID。主体不一致要补 AppID 主体信息。小程序上已有商户号时，新商户号费率必须一致，否则不能在线绑定。绑定后暂不支持解绑。三家要各自建一条绑定。</p>
+    <div class="shot"><img src="screenshots/appid_limits.png" alt="商户号绑定 AppID 的七条限制"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  截图均来自微信支付 / 微信开放平台官方页面 · 仅供内部参考<br>
+  政策细节、费率、审核时长以平台最新公示为准
+</footer>
+
+</body>
+</html>
