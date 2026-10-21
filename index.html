@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -146,6 +146,8 @@
   a.anchor-link:hover { color: var(--wx-green); text-decoration-style: solid; }
   #settlement-account { scroll-margin-top: 20px; }
 </style>
+<style>html.i18n-loading body{opacity:0}</style>
+<script>(function(){var d=document.documentElement;d.className+=' i18n-loading';try{if(localStorage.getItem('qima-wxpay-lang')!=='zh'){d.lang='en';}else{d.lang='zh-CN';}}catch(e){d.lang='en';}})();</script>
 </head>
 <body>
 
@@ -610,7 +612,7 @@
 
   var saved = null;
   try { saved = localStorage.getItem(KEY); } catch (e) {}
-  var lang = saved === 'en' ? 'en' : 'zh';
+  var lang = saved === 'zh' ? 'zh' : 'en';
 
   document.getElementById('langToggle').addEventListener('click', function () {
     lang = lang === 'en' ? 'zh' : 'en';
@@ -619,6 +621,7 @@
   });
 
   apply(lang);
+  document.documentElement.classList.remove('i18n-loading');
 
   document.addEventListener('click', function (e) {
     var a = e.target && e.target.closest ? e.target.closest('a.anchor-link') : null;
