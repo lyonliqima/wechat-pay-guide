@@ -133,6 +133,18 @@
     table.facts { font-size: 13px; }
     .lang-toggle { right: 16px; bottom: 16px; height: 44px; min-width: 54px; font-size: 13px; }
   }
+
+  html { scroll-behavior: smooth; }
+  a.anchor-link {
+    color: #067A45;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    cursor: pointer;
+  }
+  a.anchor-link:hover { color: var(--wx-green); text-decoration-style: solid; }
+  #settlement-account { scroll-margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -209,7 +221,7 @@
       <tbody>
         <tr>
           <td><span class="step-num">1</span> <span data-en="Prepare">准备</span></td>
-          <td class="now" data-en="Gather documents: business licence, RMB corporate account under the exact same name (basic or general account, able to make outbound transfers), PND passport, handling officer ID, letter of authorisation, verified WeChat account of the handling officer">备齐材料：营业执照、同名人民币对公户（户名与执照逐字一致，基本户或一般户均可，且能对外付款）、PND 护照、经办人证件、业务办理授权函、经办人实名微信</td>
+          <td class="now" data-en="Gather documents: business licence, <a class='anchor-link' href='#settlement-account'>RMB corporate account under the exact same name</a> (basic or general account, able to make outbound transfers), PND passport, handling officer ID, letter of authorisation, verified WeChat account of the handling officer">备齐材料：营业执照、<a class="anchor-link" href="#settlement-account">同名人民币对公户</a>（户名与执照逐字一致，基本户或一般户均可，且能对外付款）、PND 护照、经办人证件、业务办理授权函、经办人实名微信</td>
           <td data-en="Handling officer + Finance">经办人 + 财务</td>
           <td class="now" data-en="TBD">待定</td>
           <td class="now" data-en="The bottleneck is checking whether the corporate account name equals the current full licence name. Both Dongguan and Hangzhou have been renamed; if the bank name is still the old one, change it at the bank first — timing TBD.">瓶颈是核对对公户名是否等于当前执照全称。东莞、杭州均改过名，若银行户名仍是旧名需先去银行变更，变更耗时待定。</td>
@@ -316,7 +328,7 @@
     <h2 data-en="Finance: funds, accounts, fees, invoices">财务：钱、账户、费率、票据</h2>
     <p class="desc" data-en="This section covers only what Finance must decide and operate, not technical implementation.">这一节只放财务要拍板和要操作的事，不含技术实现。</p>
     <ul class="kv">
-      <li>
+      <li id="settlement-account">
         <span class="k" data-en="Settlement account">结算账户</span>
         <span class="v" data-en="Enterprises <strong>can only use a corporate account, and the account name must match the business licence character for character</strong>. Check each item before applying:<br>
 · <strong>Account name</strong>: identical to the full licence name <strong>character for character</strong> — full-width vs half-width brackets, presence of Co., Ltd., any spaces in between. No abbreviations, no suffixes such as (hereinafter referred to as). The system auto-fills the entity name from the licence; if the bank name does not match, it fails.<br>
@@ -607,6 +619,22 @@
   });
 
   apply(lang);
+
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a.anchor-link') : null;
+    if (!a) return;
+    var sel = a.getAttribute('href');
+    var t = sel ? document.querySelector(sel) : null;
+    if (!t) return;
+    e.preventDefault();
+    t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (history.replaceState) history.replaceState(null, '', sel);
+  });
+
+  if (location.hash) {
+    var target = document.querySelector(location.hash);
+    if (target) setTimeout(function () { target.scrollIntoView(); }, 0);
+  }
 })();
 </script>
 
